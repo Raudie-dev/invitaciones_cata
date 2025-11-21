@@ -1,0 +1,399 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ invitacion.nombre }} - Mis XV Años</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/mains.css' %}">
+        <style>
+            .confirm-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center, rgba(255,255,255,0.95), rgba(255,192,203,0.85));z-index:9999;opacity:0;pointer-events:none;transition:opacity .5s ease}
+            .confirm-overlay.show{opacity:1;pointer-events:auto}
+            .confirm-content{background:linear-gradient(135deg,#ffe6f2,#fff);padding:3rem 2.5rem;border-radius:24px;box-shadow:0 10px 35px rgba(0,0,0,0.15);text-align:center;position:relative;overflow:hidden}
+            .confirm-content:before,.confirm-content:after{content:"";position:absolute;border-radius:50%;background:rgba(255,182,193,0.4);animation:pulse 6s infinite ease-in-out}
+            .confirm-content:before{width:220px;height:220px;top:-60px;left:-60px}
+            .confirm-content:after{width:160px;height:160px;bottom:-40px;right:-40px}
+            @keyframes pulse{0%,100%{transform:scale(0.9);opacity:.6}50%{transform:scale(1.15);opacity:.3}}
+            .confirm-title{font-size:2.2rem;font-weight:600;margin-bottom:.75rem;color:#c2185b;animation:fadeSlide .8s both}
+            .confirm-text{font-size:1.15rem;color:#6d214f;animation:fadeSlide 1s .15s both}
+            @keyframes fadeSlide{0%{opacity:0;transform:translateY(25px)}100%{opacity:1;transform:translateY(0)}}
+            .celebration-particles{position:absolute;inset:0;pointer-events:none}
+            .particle{position:absolute;width:10px;height:10px;background:#ff80ab;border-radius:50%;animation:rise 5s linear infinite;opacity:.7}
+            @keyframes rise{0%{transform:translateY(0) scale(.8);opacity:.8}100%{transform:translateY(-600px) scale(1.2);opacity:0}}
+        </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-overlay">
+            <div class="hero-content">
+                <h1 class="hero-title">María Catalina</h1>
+                <h3>Mis VX Años</h3>
+             
+                <p class="event-date">{{ invitacion.fecha|date:"d \d\e F Y"|upper }}</p>
+                
+                <div class="audio-container">
+                    <audio id="celebration-song" controls autoplay class="audio-player" preload="auto" loop>
+                        <source src="{% static "musica/V 'Love Me Again' Official MV.mp3" %}" type="audio/mpeg">
+                        Tu navegador no soporta reproducción de audio.
+                    </audio>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <main class="main-content">
+        <!-- Invitation Section -->
+        <section class="invitation-section">
+            <div class="section-content">
+                <h2 class="section-header">¡Estás Invitado!</h2>
+                <div class="names-container">
+                    <p class="names">{{ invitacion.nombre }}</p>
+                </div>
+                
+                <p class="invitation-text">Quiero que seas parte de este momento tan especial en mi vida. Acompáñame a celebrar mis quince años.</p>
+                
+                <!-- Countdown Timer -->
+                <div class="countdown-container" aria-live="polite" aria-atomic="true" aria-label="Cuenta regresiva para la celebración">
+                    <div class="countdown-item">
+                        <span id="dias">00</span>
+                        <span class="countdown-label">Días</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span id="horas">00</span>
+                        <span class="countdown-label">Horas</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span id="minutos">00</span>
+                        <span class="countdown-label">Minutos</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span id="segundos">00</span>
+                        <span class="countdown-label">Segundos</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ceremony Section -->
+        <section class="ceremony-section">
+            <div class="section-content">
+                <h2 class="section-header">Misa de Accion de Gracias</h2>
+                <div class="church-image-container">
+                    <img src="{% static "images/iglesia-foto.jpg"%}" 
+                         alt="Iglesia Santa Rosa De Lima" 
+                         class="church-image">
+                    
+                    <p class="ceremony-details">Se realizara en la Iglesia Santa Rosa de Lima</p>
+                    <p class="ceremony-time">20 de Diembre | 10am</p>
+                </div>
+                <h2 class="section-header">Lugar de celebración de Quince Años</h2>
+                <div class="ceremony-details">
+                    <p class="ceremony-name">{{ invitacion.ubicacion.nombre }}</p>
+                    <p class="ceremony-address">{{ invitacion.ubicacion.direccion }}</p>
+                    <p class="ceremony-time">
+                        {% comment %}Only show time formats if fecha includes time (datetime).{% endcomment %}
+                        {% if invitacion.fecha.hour is not None %}
+                            {{ invitacion.fecha|date:"d \d\e F" }} | {{ invitacion.fecha|date:"g:i A" }}
+                        {% else %}
+                            {{ invitacion.fecha|date:"d \d\e F Y" }}
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="btn-container">
+                    <button class="button-primary" onclick="window.open('{{ invitacion.ubicacion.google_maps_url }}', '_blank')">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Ver Ubicación
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Photo Timeline Section -->
+        <section class="timeline-section">
+            <div class="section-content">
+                <h2 class="section-header">Mi Historia</h2>
+                <p class="timeline-intro">Un recorrido por estos 15 años maravillosos</p>
+                
+                <div class="photo-timeline">
+                    <div class="timeline-item" data-year="2010">
+                        <div class="timeline-photo">
+                           <img src="{% static "images/recien-nacida.jpg" %}" alt="Recién Nacida">
+                            <div class="timeline-year">2010</div>
+                        </div>
+                        <div class="timeline-description">
+                            <h3>El Comienzo</h3>
+                            <p>Mi llegada al mundo, el inicio de esta hermosa aventura</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item" data-year="2013">
+                        <div class="timeline-photo">
+                               <img src="{% static "images/mis-primeros-pasos.jpg" %}" alt="Primeros Pasos">
+                            <div class="timeline-year">2013</div>
+                        </div>
+                        <div class="timeline-description">
+                            <h3>Primeros Pasos</h3>
+                            <p>Descubriendo el mundo con curiosidad y alegría</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item" data-year="2016">
+                        <div class="timeline-photo">
+                               <img src="{% static "images/nuevas-aventuras.jpg" %}" alt="Nuevas Aventuras">
+                            <div class="timeline-year">2016</div>
+                        </div>
+                        <div class="timeline-description">
+                            <h3>Nuevas Aventuras</h3>
+                            <p>Mi primer día de escuela, haciendo nuevos amigos</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item" data-year="2020">
+                        <div class="timeline-photo">
+                            <img src="{% static "images/creciendo.jpg" %}" alt="10 años">
+                            <div class="timeline-year">2020</div>
+                        </div>
+                        <div class="timeline-description">
+                            <h3>Creciendo</h3>
+                            <p>Descubriendo mis pasiones y talentos</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item" data-year="2025">
+                        <div class="timeline-photo">
+                            <img src="{% static "images/mis-15-anos.jpg" %}" alt="Mis XV Años">
+                            <div class="timeline-year">2025</div>
+                        </div>
+                        <div class="timeline-description">
+                            <h3>Mis XV Años</h3>
+                            <p>Celebrando esta etapa especial de mi vida</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Itinerary Section -->
+        <section class="itinerary-section">
+            <div class="section-content">
+                <h2 class="section-header">Itinerario de Actividades</h2>
+                <div class="itinerary-timeline">
+                    <div class="itinerary-item">
+                        <div class="itinerary-icon">
+                            <i class="fas fa-church"></i>
+                        </div>
+                        <div class="itinerary-line"></div>
+                        <div class="itinerary-details">
+                            <span class="itinerary-text">Ceremonia Religiosa</span>
+                            <span class="itinerary-time">3:00 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="itinerary-item">
+                        <div class="itinerary-icon">
+                            <i class="fas fa-glass-cheers"></i>
+                        </div>
+                        <div class="itinerary-line"></div>
+                        <div class="itinerary-details">
+                            <span class="itinerary-text">Recepción</span>
+                            <span class="itinerary-time">5:30 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="itinerary-item">
+                        <div class="itinerary-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="itinerary-line"></div>
+                        <div class="itinerary-details">
+                            <span class="itinerary-text">Sesión de Fotos</span>
+                            <span class="itinerary-time">6:00 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="itinerary-item">
+                        <div class="itinerary-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="itinerary-line"></div>
+                        <div class="itinerary-details">
+                            <span class="itinerary-text">Vals y Ceremonia</span>
+                            <span class="itinerary-time">7:00 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="itinerary-item">
+                        <div class="itinerary-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="itinerary-line"></div>
+                        <div class="itinerary-details">
+                            <span class="itinerary-text">Cena</span>
+                            <span class="itinerary-time">8:00 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="itinerary-item">
+                        <div class="itinerary-icon">
+                            <i class="fas fa-birthday-cake"></i>
+                        </div>
+                        <div class="itinerary-line"></div>
+                        <div class="itinerary-details">
+                            <span class="itinerary-text">Pastel</span>
+                            <span class="itinerary-time">9:00 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="itinerary-item">
+                        <div class="itinerary-icon">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="itinerary-line last"></div>
+                        <div class="itinerary-details">
+                            <span class="itinerary-text">Baile y Fiesta</span>
+                            <span class="itinerary-time">9:30 PM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dress Code Section -->
+        <section class="dress-code-section">
+            <div class="section-content">
+                <h2 class="section-header">Código de Vestimenta</h2>
+                <div class="dress-code-icon">
+                    <!-- Icon representing an elegant suit -->
+                    <i class="fas fa-user-tie fa-3x" aria-hidden="true"></i>
+                    <span class="visually-hidden">Traje elegante</span>
+                </div>
+                <p class="dress-code-title">Formal | Elegante</p>
+                <p class="dress-code-description">Te esperamos con tu mejor atuendo para celebrar esta noche especial.</p>
+                <i class="icon-dress fa-3x" aria-hidden="true" title="Vestido" role="img" style="display:inline-block;line-height:0">        
+                <img src="https://img.icons8.com/?size=100&id=10156&format=png&color=#2e7d32" alt="Vestido">
+                
+                </i>
+                <p class="dress-code-description" style="margin-top:6px">
+                    <strong>Nota:</strong> El color <span style="color:#2e7d32;font-weight:800">verde</span> está reservado para la <span style="color:#2e7d32;font-weight:800">quinceañera</span>.
+                </p>
+            </div>
+        </section>
+
+        <!-- Reservation Section -->
+        <section class="reservation-section">
+            <div class="section-content">
+                <h2 class="section-header">Recepción</h2>
+                <div class="location-info">
+                    <p class="venue-name">{{ invitacion.ubicacion.direccion }}</p>
+                    <p class="venue-time">{{ invitacion.fecha|date:"d \d\e F" }} | 5:30 PM</p>
+                    
+                </div>
+                <p class="reserve-text">Te hemos reservado para:</p>
+                <p class="guest-item" style="font-family: 'Great Vibes';"> {{ invitacion.invitados.count }} {{ invitacion.invitados.count|pluralize:"" }}  Personas</p>
+                <ul class="tables-list" >
+                    {% for mesa in invitacion.mesas.all %}
+                            <li class="table-item" style="font-family: 'Great Vibes';">
+                                {{ mesa.nombre }} Mesa
+                            </li>
+                        {% empty %}
+                            <li class="table-item" style="font-family: 'Great Vibes';">No hay mesas asociadas.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="button-container">
+                    <button class="button-confirm" data-bs-toggle="modal" data-bs-target="#confirmAttendanceModal">
+                        <i class="fas fa-check-circle"></i>
+                        Confirmar Asistencia
+                    </button>
+                </div>
+                
+            </div>
+        </section>
+    </main>
+
+        <!-- Overlay de confirmación animado -->
+        <div id="confirmOverlay" class="confirm-overlay {% if confirm_success %}show{% endif %}" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="confirm-content">
+                <div class="celebration-particles" id="particlesContainer"></div>
+                <h2 class="confirm-title">¡Gracias por confirmar!</h2>
+                <p class="confirm-text">Te esperamos con mucha alegría ✨</p>
+                <button type="button" class="btn btn-outline-danger mt-3" onclick="closeConfirmOverlay()">Cerrar</button>
+            </div>
+        </div>
+
+    <!-- Modal for confirming attendance and suggesting songs -->
+    <div class="modal fade" id="confirmAttendanceModal" tabindex="-1" aria-labelledby="confirmAttendanceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmAttendanceModalLabel">Confirmar Asistencia y Sugerir Canciones</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <p class="modal-intro">¿Confirmas tu asistencia a mis XV años?</p>
+                        <div id="songSuggestions">
+                            <div class="song-suggestion mb-3">
+                                <label for="songName1" class="form-label">Sugiere una canción que deseas Bailar</label>
+                                <input type="text" class="form-control" id="songName1" name="song_name[]" placeholder="Nombre de la canción">
+                                <label for="artistName1" class="form-label mt-2">Artista</label>
+                                <input type="text" class="form-control" id="artistName1" name="artist_name[]" placeholder="Nombre del artista (opcional)">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-outline-success" id="addSong">
+                            <i class="fas fa-plus-circle"></i> Agregar otra canción
+                        </button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check"></i> Confirmar Asistencia
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+        <script>
+        // Build a JS timestamp safely and expose it on the window object so main.js can read it.
+        // Include time only when available.
+        const fechaString = "{% if invitacion.fecha.hour is not None %}{{ invitacion.fecha|date:'Y-m-d H:i:s' }}{% else %}{{ invitacion.fecha|date:'Y-m-d' }}T00:00:00{% endif %}";
+        // Set global variable used by main.js
+        window.invitacionFecha = new Date(fechaString).getTime();
+
+                // Partículas festivas si se mostró el overlay
+                const particlesContainer = document.getElementById('particlesContainer');
+                if (document.getElementById('confirmOverlay')?.classList.contains('show')) {
+                    for (let i = 0; i < 40; i++) {
+                        const p = document.createElement('div');
+                        p.className = 'particle';
+                        p.style.left = Math.random()*100 + '%';
+                        p.style.bottom = '-20px';
+                        p.style.background = ['#ff80ab','#ff4081','#f50057','#ffb3c1'][Math.floor(Math.random()*4)];
+                        p.style.animationDelay = (Math.random()*4)+'s';
+                        p.style.opacity = (0.4 + Math.random()*0.6).toString();
+                        particlesContainer.appendChild(p);
+                    }
+                    // Auto cerrar después de unos segundos
+                    setTimeout(() => { closeConfirmOverlay(); }, 6500);
+                }
+
+                window.closeConfirmOverlay = function(){
+                    const overlay = document.getElementById('confirmOverlay');
+                    if(!overlay) return;
+                    overlay.classList.remove('show');
+                    setTimeout(() => { overlay.style.display='none'; }, 600);
+                }
+    </script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Invitaciones</title>
+    <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/paneles-style.css' %}">
+</head>
+<body>
+    <!-- Navbar superior -->
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <button class="btn btn-outline-light" id="sidebarToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="ms-auto d-flex align-items-center">
+          <span class="me-3 d-none d-md-inline text-muted">
+            <i class="fas fa-user-circle me-1"></i> Administrador
+          </span>
+          <a href="{% url 'logout' %}" class="btn btn-outline-light">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="d-none d-md-inline ms-1">Cerrar Sesión</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+    
+    <div class="d-flex" id="wrapper">
+      <!-- Sidebar -->
+      <div id="sidebar-wrapper">
+        <div class="sidebar-heading text-center">
+          <h5>Gestión de Invitaciones</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          <a href="{% url 'dashboard' %}" class="list-group-item active">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="{% url 'crear_invitacion_mesa' %}" class="list-group-item">
+            <i class="fas fa-envelope-open-text"></i>
+            <span>Invitaciones y Mesas</span>
+          </a>
+          <a href="{% url 'agregar_invitado' %}" class="list-group-item">
+            <i class="fas fa-user-plus"></i>
+            <span>Agregar Invitado</span>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Contenido principal -->
+      <div id="page-content-wrapper">
+        <!-- Encabezado -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="mb-1">
+              <i class="fas fa-chart-line me-2 text-primary"></i>Dashboard
+            </h2>
+            <p class="text-muted mb-0">Resumen general de invitaciones y confirmaciones</p>
+          </div>
+          <a href="{% url 'export_confirmed_guests' %}" class="btn btn-primary">
+            <i class="fas fa-download"></i>
+            <span class="d-none d-md-inline ms-1">Exportar Datos</span>
+          </a>
+        </div>
+
+        <!-- Tarjetas de estadísticas -->
+        <div class="row g-4 mb-4">
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card text-bg-primary h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                          <div>
+                            <h5 class="card-title mb-0">Total Invitaciones</h5>
+                          </div>
+                          <div class="fs-3 opacity-75">
+                            <i class="fas fa-envelope"></i>
+                          </div>
+                        </div>
+                        <p class="card-text display-4">{{ total_invitaciones }}</p>
+                        <small class="opacity-75">Invitaciones creadas</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card text-bg-info h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                          <div>
+                            <h5 class="card-title mb-0">Total Invitados</h5>
+                          </div>
+                          <div class="fs-3 opacity-75">
+                            <i class="fas fa-users"></i>
+                          </div>
+                        </div>
+                        <p class="card-text display-4">{{ total_invitados }}</p>
+                        <small class="opacity-75">Personas invitadas</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card text-bg-success h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                          <div>
+                            <h5 class="card-title mb-0">Invitaciones Confirmadas</h5>
+                          </div>
+                          <div class="fs-3 opacity-75">
+                            <i class="fas fa-check-circle"></i>
+                          </div>
+                        </div>
+                        <p class="card-text display-4">{{ invitaciones_confirmadas }}</p>
+                        <small class="opacity-75">Confirmaciones recibidas</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card text-bg-warning h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                          <div>
+                            <h5 class="card-title mb-0">Invitados Confirmados</h5>
+                          </div>
+                          <div class="fs-3 opacity-75">
+                            <i class="fas fa-user-check"></i>
+                          </div>
+                        </div>
+                        <p class="card-text display-4">{{ invitados_confirmados }}</p>
+                        <small class="opacity-75">Asistentes confirmados</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="row g-4">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">
+                  <i class="fas fa-info-circle me-2"></i>Información del Sistema
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6 mb-3 mb-md-0">
+                    <h6 class="text-muted mb-3">Acciones Rápidas</h6>
+                    <div class="d-flex flex-column gap-2">
+                      <a href="{% url 'crear_invitacion_mesa' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-plus-circle me-2"></i>Crear Nueva Invitación
+                      </a>
+                      <a href="{% url 'agregar_invitado' %}" class="btn btn-outline-success btn-sm">
+                        <i class="fas fa-user-plus me-2"></i>Agregar Invitado
+                      </a>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="text-muted mb-3">Estadísticas</h6>
+                    <div class="d-flex flex-column gap-2">
+                      <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                        <span class="text-muted">Tasa de confirmación:</span>
+                        <strong class="text-success">
+                          {% if total_invitaciones > 0 %}
+                            {{ invitaciones_confirmadas|floatformat:0 }}%
+                          {% else %}
+                            0%
+                          {% endif %}
+                        </strong>
+                      </div>
+                      <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                        <span class="text-muted">Promedio por invitación:</span>
+                        <strong class="text-info">
+                          {% if total_invitaciones > 0 %}
+                            {% widthratio total_invitados total_invitaciones 1 %} personas
+                          {% else %}
+                            0 personas
+                          {% endif %}
+                        </strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast container -->
+    <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 3000;">
+      {% for message in messages %}
+      <div class="toast align-items-center text-bg-{{ message.tags|default:'info' }} border-0 show mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="fas fa-info-circle me-2"></i> {{ message }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle sidebar
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const wrapper = document.getElementById('wrapper');
+        
+        if (sidebarToggle && wrapper) {
+            sidebarToggle.addEventListener('click', function() {
+                wrapper.classList.toggle('toggled');
+            });
+
+            // Cerrar sidebar al hacer clic fuera en móvil
+            if (window.innerWidth < 768) {
+                document.addEventListener('click', function(e) {
+                    if (wrapper.classList.contains('toggled') && 
+                        !e.target.closest('#sidebar-wrapper') && 
+                        !e.target.closest('#sidebarToggle')) {
+                        wrapper.classList.remove('toggled');
+                    }
+                });
+            }
+        }
+
+        // Inicializar toasts
+        const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+        toastElList.forEach(function(toastEl) {
+            const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+            toast.show();
+        });
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,706 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Invitaciones y Mesas</title>
+    <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/paneles-style.css' %}">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        #sidebar-wrapper { transition: margin-left 0.3s; }
+        #wrapper.toggled #sidebar-wrapper { margin-left: -250px !important; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <button class="btn btn-outline-light" id="sidebarToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="ms-auto d-flex align-items-center">
+          <span class="me-3 d-none d-md-inline text-muted">
+            <i class="fas fa-user-circle me-1"></i> Administrador
+          </span>
+          <a href="{% url 'logout' %}" class="btn btn-outline-light">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="d-none d-md-inline ms-1">Cerrar Sesión</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+    
+    <div class="d-flex" id="wrapper">
+      <!-- Sidebar -->
+      <div id="sidebar-wrapper">
+        <div class="sidebar-heading text-center">
+          <h5>Gestión de Invitaciones</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          <a href="{% url 'dashboard' %}" class="list-group-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="{% url 'crear_invitacion_mesa' %}" class="list-group-item active">
+            <i class="fas fa-envelope-open-text"></i>
+            <span>Invitaciones y Mesas</span>
+          </a>
+          <a href="{% url 'agregar_invitado' %}" class="list-group-item">
+            <i class="fas fa-user-plus"></i>
+            <span>Agregar Invitado</span>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Contenido principal -->
+      <div id="page-content-wrapper">
+        <!-- Alerta de fecha/ubicación global -->
+        <div class="alert alert-info d-flex align-items-center justify-content-between" role="alert">
+            <div>
+              <i class="fas fa-calendar-alt me-2"></i>
+              <strong>Fecha:</strong>
+              <span class="ms-2">{{ fecha_evento.fecha|date:"d/m/Y" }}</span>
+              <span class="mx-3">|</span>
+              <i class="fas fa-map-marker-alt me-2"></i>
+              <strong>Ubicación:</strong>
+              <span class="ms-2">{% if fecha_evento.ubicacion %}{{ fecha_evento.ubicacion.nombre }}{% else %}<span class="text-danger">No definida</span>{% endif %}</span>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalUbicacionGlobal">
+                    <i class="fas fa-map-pin"></i> Establecer Ubicación Global
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalFecha">
+                    <i class="fas fa-calendar-alt"></i> Establecer Fecha Global
+                </button>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE INVITACIONES -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-envelope-open-text me-2"></i>Invitaciones</h4>
+            </div>
+            <div class="card-body">
+                <!-- Botón para crear invitación -->
+                <div class="mb-3">
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCrearInvitacion">
+                        <i class="fas fa-plus"></i> Crear Invitación
+                    </button>
+                </div>
+
+                <!-- Tabla responsive mejorada -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Fecha</th>
+                                <th>Ubicación</th>
+                                <th>Enlace</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invitacion in invitaciones %}
+                            <tr>
+                                <td><strong>{{ invitacion.nombre }}</strong></td>
+                                <td>{{ invitacion.fecha|date:"d/m/Y" }}</td>
+                                <td>
+                                  <i class="fas fa-map-marker-alt text-danger me-1"></i>
+                                  {{ invitacion.ubicacion.nombre }}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                      <a href="{% url 'index' slug=invitacion.slug %}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                          <i class="fas fa-external-link-alt"></i>
+                                          <span class="d-none d-md-inline ms-1">Ver</span>
+                                      </a>
+                                      <button type="button" class="btn btn-outline-secondary btn-sm copy-invite-url" data-url="{% url 'index' slug=invitacion.slug %}">
+                                          <i class="fas fa-copy"></i>
+                                          <span class="d-none d-md-inline ms-1">Copiar</span>
+                                      </button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarInvitacion{{ invitacion.id }}">
+                                            <i class="fas fa-edit"></i>
+                                            <span class="d-none d-lg-inline ms-1">Editar</span>
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminarInvitacion{{ invitacion.id }}">
+                                            <i class="fas fa-trash"></i>
+                                            <span class="d-none d-lg-inline ms-1">Eliminar</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                  <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                  No hay invitaciones creadas
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE MESAS -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="fas fa-chair me-2"></i>Gestión de Mesas</h4>
+            </div>
+            <div class="card-body">
+                <!-- Formulario para crear mesa -->
+                <form method="post" class="row g-3 mb-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="crear_mesa" value="1">
+                    <div class="col-12 col-md-9">
+                        <input type="text" name="nombre_mesa" class="form-control" placeholder="Nombre de la mesa (ej: Mesa 1, Mesa VIP)" required>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-plus"></i> Crear Mesa
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Tabla de mesas -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mesa in mesas %}
+                            <tr>
+                                <td><strong>{{ mesa.nombre }}</strong></td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarMesa{{ mesa.id }}">
+                                            <i class="fas fa-edit"></i>
+                                            <span class="d-none d-lg-inline ms-1">Editar</span>
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminarMesa{{ mesa.id }}">
+                                            <i class="fas fa-trash"></i>
+                                            <span class="d-none d-lg-inline ms-1">Eliminar</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" class="text-center text-muted py-4">
+                                  <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                  No hay mesas creadas
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE CONFIGURACIÓN -->
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h4 class="mb-0"><i class="fas fa-cog me-2"></i>Configuración del Evento</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-column flex-md-row gap-3">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalUbicacion">
+                        <i class="fas fa-map-marker-alt"></i> Agregar Ubicación
+                    </button>
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalFecha">
+                        <i class="fas fa-calendar-alt"></i> Establecer Fecha Global
+                    </button>
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalUbicacionGlobal">
+                        <i class="fas fa-map-pin"></i> Ubicación Global
+                    </button>
+                </div>
+            </div>
+        </div>
+
+                <!-- SECCIÓN CONFIRMACIONES Y CANCIONES -->
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h4 class="mb-0"><i class="fas fa-music me-2"></i>Confirmaciones y Canciones Sugeridas</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if confirmadas %}
+                            <div class="accordion" id="confirmAccordion">
+                                {% for invitacion in confirmadas %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading{{ invitacion.id }}">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ invitacion.id }}" aria-expanded="false" aria-controls="collapse{{ invitacion.id }}">
+                                            {{ invitacion.nombre }} ({{ invitacion.fecha|date:"d/m/Y" }}) - {{ invitacion.playlists.count }} canciones
+                                        </button>
+                                    </h2>
+                                    <div id="collapse{{ invitacion.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ invitacion.id }}" data-bs-parent="#confirmAccordion">
+                                        <div class="accordion-body p-0">
+                                            <table class="table mb-0">
+                                                <thead>
+                                                    <tr><th style="width:60%">Canción</th><th>Artista</th></tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for playlist in invitacion.playlists.all %}
+                                                    <tr>
+                                                        <td>{{ playlist.song_name }}</td>
+                                                        <td>{{ playlist.artist_name|default:"—" }}</td>
+                                                    </tr>
+                                                    {% empty %}
+                                                    <tr>
+                                                        <td colspan="2" class="text-center text-muted py-3">Sin canciones sugeridas</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted mb-0">Aún no hay invitaciones confirmadas.</p>
+                        {% endif %}
+                    </div>
+                </div>
+      </div>
+    </div>
+
+    <!-- MODAL UBICACIÓN GLOBAL -->
+    <div class="modal fade" id="modalUbicacionGlobal" tabindex="-1" aria-labelledby="modalUbicacionGlobalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="setear_ubicacion_global" value="1">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalUbicacionGlobalLabel">Establecer Ubicación Global</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Ubicación *</label>
+                            <select name="ubicacion_global_id" class="form-select" required>
+                                <option value="">Selecciona una ubicación</option>
+                                {% for ubicacion in ubicaciones %}
+                                    <option value="{{ ubicacion.id }}" {% if fecha_evento.ubicacion and fecha_evento.ubicacion.id == ubicacion.id %}selected{% endif %}>{{ ubicacion.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <p class="text-muted"><small>Esta ubicación se usará para todas las invitaciones nuevas y ediciones.</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CREAR INVITACIÓN -->
+    <div class="modal fade" id="modalCrearInvitacion" tabindex="-1" aria-labelledby="modalCrearInvitacionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="crear_invitacion" value="1">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalCrearInvitacionLabel">Crear Nueva Invitación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre de la Invitación *</label>
+                            <input type="text" name="nombre_invitacion" class="form-control" placeholder="Ej: Familia Pérez" required>
+                        </div>
+                        <div class="alert alert-secondary py-2">
+                            <small><i class="fas fa-info-circle"></i> Se usarán fecha ({{ fecha_evento.fecha|date:'d/m/Y' }}) y ubicación global{% if fecha_evento.ubicacion %}: {{ fecha_evento.ubicacion.nombre }}{% else %} (no definida){% endif %}. No necesitas seleccionarlas.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Invitados</label>
+                            <select name="invitados_invitacion" class="form-select select2" id="select-invitados" multiple>
+                                {% for invitado in invitados %}
+                                    <option value="{{ invitado.id }}" {% if invitado.id in invitados_ocupados_ids %}disabled data-bs-toggle="tooltip" title="Ya asignado a otra invitación"{% endif %}>
+                                        {{ invitado.nombre }}{% if invitado.apellido %} {{ invitado.apellido }}{% endif %}{% if invitado.id in invitados_ocupados_ids %} (Asignado){% endif %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mesas</label>
+                            <select name="mesas_invitacion" class="form-select select2" id="select-mesas" multiple>
+                                {% for mesa in mesas %}
+                                    <option value="{{ mesa.id }}" {% if mesa.id in mesas_ocupadas_ids %}disabled data-bs-toggle="tooltip" title="Mesa ya asignada a otra invitación"{% endif %}>{{ mesa.nombre }}{% if mesa.id in mesas_ocupadas_ids %} (Asignada){% endif %}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Crear Invitación</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL AGREGAR UBICACIÓN -->
+    <div class="modal fade" id="modalUbicacion" tabindex="-1" aria-labelledby="modalUbicacionLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="agregar_ubicacion" value="1">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalUbicacionLabel">Agregar Nueva Ubicación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre de la Ubicación *</label>
+                            <input type="text" name="nombre_ubicacion" class="form-control" placeholder="Ej: Salón de Fiestas" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dirección *</label>
+                            <input type="text" name="direccion_ubicacion" class="form-control" placeholder="Ej: Calle Principal #123" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">URL de Google Maps *</label>
+                            <input type="url" name="google_maps_url" class="form-control" placeholder="https://maps.google.com/..." required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Agregar Ubicación</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL FECHA GLOBAL -->
+    <div class="modal fade" id="modalFecha" tabindex="-1" aria-labelledby="modalFechaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="setear_fecha_global" value="1">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalFechaLabel">Establecer Fecha Global del Evento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Fecha del Evento *</label>
+                            <input type="date" name="fecha_global" class="form-control" value="{{ fecha_evento.fecha|date:'Y-m-d' }}" required>
+                        </div>
+                        <p class="text-muted"><small>Esta fecha se usará como referencia para las invitaciones.</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-secondary">Actualizar Fecha</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODALES PARA EDITAR/ELIMINAR INVITACIONES -->
+    {% for invitacion in invitaciones %}
+    <!-- Modal Editar Invitación -->
+    <div class="modal fade" id="modalEditarInvitacion{{ invitacion.id }}" tabindex="-1" aria-labelledby="modalEditarInvitacionLabel{{ invitacion.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="editar_invitacion" value="1">
+                <input type="hidden" name="invitacion_id" value="{{ invitacion.id }}">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalEditarInvitacionLabel{{ invitacion.id }}">Editar Invitación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre de la Invitación</label>
+                            <input type="text" name="nombre_invitacion" class="form-control" value="{{ invitacion.nombre }}" required>
+                        </div>
+                        <div class="alert alert-secondary py-2">
+                            <small><i class="fas fa-info-circle"></i> La fecha y la ubicación son globales. Para cambiarlas usa la sección Configuración del Evento.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Invitados</label>
+                            <select name="invitados_invitacion" class="form-select select2-edit" multiple>
+                                {% for invitado in invitados %}
+                                    {% if invitado in invitacion.invitados.all %}
+                                        <option value="{{ invitado.id }}" selected>{{ invitado.nombre }}{% if invitado.apellido %} {{ invitado.apellido }}{% endif %}</option>
+                                    {% else %}
+                                        <option value="{{ invitado.id }}" {% if invitado.id in invitados_ocupados_ids %}disabled data-bs-toggle="tooltip" title="Ya asignado a otra invitación"{% endif %}>
+                                            {{ invitado.nombre }}{% if invitado.apellido %} {{ invitado.apellido }}{% endif %}{% if invitado.id in invitados_ocupados_ids %} (Asignado){% endif %}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mesas</label>
+                            <select name="mesas_invitacion" class="form-select select2-edit" multiple>
+                                {% for mesa in mesas %}
+                                    {% if mesa in invitacion.mesas.all %}
+                                        <option value="{{ mesa.id }}" selected>{{ mesa.nombre }}</option>
+                                    {% else %}
+                                        <option value="{{ mesa.id }}" {% if mesa.id in mesas_ocupadas_ids %}disabled data-bs-toggle="tooltip" title="Mesa ya asignada a otra invitación"{% endif %}>{{ mesa.nombre }}{% if mesa.id in mesas_ocupadas_ids %} (Asignada){% endif %}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning">Actualizar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Eliminar Invitación -->
+    <div class="modal fade" id="modalEliminarInvitacion{{ invitacion.id }}" tabindex="-1" aria-labelledby="modalEliminarInvitacionLabel{{ invitacion.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="eliminar_invitacion" value="1">
+                <input type="hidden" name="invitacion_id" value="{{ invitacion.id }}">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalEliminarInvitacionLabel{{ invitacion.id }}">Eliminar Invitación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas eliminar la invitación <strong>"{{ invitacion.nombre }}"</strong>?</p>
+                        <p class="text-danger"><small>Esta acción no se puede deshacer. Se perderán todos los datos asociados a esta invitación.</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- MODALES PARA EDITAR/ELIMINAR MESAS -->
+    {% for mesa in mesas %}
+    <!-- Modal Editar Mesa -->
+    <div class="modal fade" id="modalEditarMesa{{ mesa.id }}" tabindex="-1" aria-labelledby="modalEditarMesaLabel{{ mesa.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="editar_mesa" value="1">
+                <input type="hidden" name="mesa_id" value="{{ mesa.id }}">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalEditarMesaLabel{{ mesa.id }}">Editar Mesa</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre de la Mesa</label>
+                            <input type="text" name="nombre_mesa" class="form-control" value="{{ mesa.nombre }}" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning">Actualizar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Eliminar Mesa -->
+    <div class="modal fade" id="modalEliminarMesa{{ mesa.id }}" tabindex="-1" aria-labelledby="modalEliminarMesaLabel{{ mesa.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="eliminar_mesa" value="1">
+                <input type="hidden" name="mesa_id" value="{{ mesa.id }}">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalEliminarMesaLabel{{ mesa.id }}">Eliminar Mesa</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas eliminar la mesa <strong>{{ mesa.nombre }}</strong>?</p>
+                        <p class="text-danger"><small>Esta acción no se puede deshacer.</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- TOAST MESSAGES -->
+    <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 3000;">
+      {% for message in messages %}
+      <div class="toast align-items-center text-bg-{{ message.tags|default:'info' }} border-0 show mb-2" role="alert" aria-live="assertive" aria-atomic="true" id="toast-message-{{ forloop.counter }}">
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="fas fa-info-circle me-2"></i> {{ message }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle sidebar
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const wrapper = document.getElementById('wrapper');
+        
+        if (sidebarToggle && wrapper) {
+            sidebarToggle.addEventListener('click', function() {
+                wrapper.classList.toggle('toggled');
+            });
+
+            // Cerrar sidebar al hacer clic fuera en móvil
+            if (window.innerWidth < 768) {
+                document.addEventListener('click', function(e) {
+                    if (wrapper.classList.contains('toggled') && 
+                        !e.target.closest('#sidebar-wrapper') && 
+                        !e.target.closest('#sidebarToggle')) {
+                        wrapper.classList.remove('toggled');
+                    }
+                });
+            }
+        }
+
+            // Inicializar tooltips para opciones deshabilitadas
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+              new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+
+        // Inicializar toasts
+        const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+        toastElList.forEach(function(toastEl) {
+            const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+            toast.show();
+        });
+
+        // Inicializar Select2
+        $('#select-invitados').select2({
+            width: '100%',
+            placeholder: 'Selecciona invitados',
+            dropdownParent: $('#modalCrearInvitacion')
+        });
+        
+        $('#select-mesas').select2({
+            width: '100%',
+            placeholder: 'Selecciona mesas',
+            dropdownParent: $('#modalCrearInvitacion')
+        });
+
+        $('.select2-edit').select2({
+            width: '100%',
+            placeholder: 'Selecciona las opciones'
+        });
+
+        // Copy invitation URL to clipboard and show a toast
+        const copyButtons = document.querySelectorAll('.copy-invite-url');
+        const toastContainer = document.querySelector('.position-fixed.top-0.end-0.p-3');
+
+        function showTemporaryToast(message, variant = 'success', timeout = 3000) {
+            if (!toastContainer) return;
+            const toastId = 'copy-toast-' + Date.now();
+            const wrapper = document.createElement('div');
+            wrapper.className = `toast align-items-center text-bg-${variant} border-0 show mb-2`;
+            wrapper.setAttribute('role', 'alert');
+            wrapper.setAttribute('aria-live', 'assertive');
+            wrapper.setAttribute('aria-atomic', 'true');
+            wrapper.id = toastId;
+
+            wrapper.innerHTML = `
+              <div class="d-flex">
+                <div class="toast-body"><i class="fas fa-check-circle me-2"></i> ${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+              </div>`;
+
+            toastContainer.appendChild(wrapper);
+
+            // Use Bootstrap Toast API to show then remove
+            try {
+                const bsToast = new bootstrap.Toast(wrapper, { delay: timeout });
+                bsToast.show();
+                setTimeout(() => {
+                    bsToast.hide();
+                    wrapper.remove();
+                }, timeout + 200);
+            } catch (e) {
+                // Fallback: remove after timeout
+                setTimeout(() => wrapper.remove(), timeout);
+            }
+        }
+
+        copyButtons.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const relUrl = btn.getAttribute('data-url');
+                if (!relUrl) return;
+
+                // Build absolute URL using window.location.origin when needed
+                let fullUrl = relUrl;
+                try {
+                    const u = new URL(relUrl, window.location.origin);
+                    fullUrl = u.href;
+                } catch (err) {
+                    fullUrl = window.location.origin + relUrl;
+                }
+
+                try {
+                    await navigator.clipboard.writeText(fullUrl);
+                    showTemporaryToast('Enlace copiado al portapapeles', 'success');
+                } catch (err) {
+                    // Fallback for older browsers: select a temporary textarea
+                    const textarea = document.createElement('textarea');
+                    textarea.value = fullUrl;
+                    textarea.style.position = 'fixed';
+                    textarea.style.left = '-9999px';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                        showTemporaryToast('Enlace copiado al portapapeles', 'success');
+                    } catch (ex) {
+                        showTemporaryToast('No se pudo copiar el enlace. Selecciona y copia manualmente.', 'warning');
+                    }
+                    textarea.remove();
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>

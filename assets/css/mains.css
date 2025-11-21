@@ -1,0 +1,855 @@
+@import url("https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Satisfy&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pinyon+Script&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  color: #2d5016;
+  line-height: 1.6;
+  overflow-x: hidden;
+  position: relative;
+  background: #fdfcfa;
+}
+
+/* Improved floral decorations with better responsive behavior */
+.floral-decoration {
+  position: fixed;
+  width: 200px;
+  height: 100vh;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 800"><defs><linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%232d5016;stop-opacity:0.3" /><stop offset="100%" style="stop-color:%233a6b1f;stop-opacity:0.2" /></linearGradient></defs><path d="M20,50 Q30,30 40,50 T60,50" fill="url(%23leafGrad)"/><circle cx="30" cy="80" r="8" fill="%23e8d5c0" opacity="0.6"/><path d="M15,150 Q25,130 35,150 T55,150" fill="url(%23leafGrad)"/><circle cx="25" cy="180" r="6" fill="%23f5e6d3" opacity="0.5"/><path d="M25,250 Q35,230 45,250 T65,250" fill="url(%23leafGrad)"/><circle cx="35" cy="280" r="7" fill="%23e8d5c0" opacity="0.6"/><path d="M10,350 Q20,330 30,350 T50,350" fill="url(%23leafGrad)"/><circle cx="20" cy="380" r="9" fill="%23f5e6d3" opacity="0.5"/><path d="M30,450 Q40,430 50,450 T70,450" fill="url(%23leafGrad)"/><circle cx="40" cy="480" r="8" fill="%23e8d5c0" opacity="0.6"/><path d="M15,550 Q25,530 35,550 T55,550" fill="url(%23leafGrad)"/><circle cx="25" cy="580" r="7" fill="%23f5e6d3" opacity="0.5"/><path d="M20,650 Q30,630 40,650 T60,650" fill="url(%23leafGrad)"/><circle cx="30" cy="680" r="6" fill="%23e8d5c0" opacity="0.6"/><path d="M25,750 Q35,730 45,750 T65,750" fill="url(%23leafGrad)"/></svg>');
+  background-repeat: repeat-y;
+  background-size: contain;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.floral-left {
+  left: 0;
+  top: 0;
+}
+
+.floral-right {
+  right: 0;
+  top: 0;
+  transform: scaleX(-1);
+}
+
+.floral-decoration.visible {
+  opacity: 1;
+}
+
+/* Enhanced hero section with better mobile scaling */
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Use the public static URL so Django serves the image correctly */
+  background: linear-gradient(358deg, rgba(45, 80, 22, 0.548), rgb(58 107 31 / 17%)),
+    url("../images/hero-1.jpg") center / cover no-repeat;
+  color: #f5e6d3;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.hero-overlay {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 900px;
+  padding: 2rem;
+}
+
+.hero-content {
+  animation: fadeInUp 1.5s ease-out;
+}
+
+.hero-title {
+  font-family: "Pinyon Script", cursive;
+  font-size: clamp(3rem, 8vw, 6rem);
+  margin-bottom: 1rem;
+  color: #f5e6d3;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+}
+
+.hero-content h3 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  margin-bottom: 1.5rem;
+  color: #e8d5c0;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.names-container {
+  margin: 2rem 0;
+}
+
+.names {
+  font-family: "Great Vibes";
+  font-size: 3rem;
+  text-align: center; 
+  color: #2d5016;
+  margin: 0;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.event-date {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  color: #e8d5c0;
+  margin: 1.5rem 0;
+  letter-spacing: 3px;
+  font-weight: 300;
+}
+
+/* Improved audio player styling */
+.audio-container {
+  margin-top: 3rem;
+  display: flex;
+  justify-content: center;
+}
+
+.audio-player {
+  width: 100%;
+  max-width: 400px;
+  height: 50px;
+  border-radius: 25px;
+  background: rgba(245, 230, 211, 0.2);
+  backdrop-filter: blur(10px);
+  padding: 0.5rem;
+}
+
+/* Better main content spacing and responsive layout */
+.main-content {
+  position: relative;
+  z-index: 2;
+  background: #fdfcfa;
+}
+
+.section-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.section-content.fade-in-up {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section-header {
+  font-family: "Playfair Display", serif;
+  font-size: 2.5rem;
+  color: #2d5016;
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.section-header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30%; 
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #47c800, transparent);
+}
+
+/* Enhanced invitation section */
+.invitation-section {
+  background: white;
+  padding: 1rem 0;
+}
+
+.invitation-text {
+  text-align: center;
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  color: #3a6b1f;
+  max-width: 700px;
+  margin: 0 auto 3rem;
+  line-height: 1.8;
+}
+
+/* Improved countdown with better mobile layout */
+.countdown-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+  gap: 0.5rem;
+  max-width: 600px;
+  margin: 3rem auto;
+}
+
+.countdown-item {
+  background: linear-gradient(135deg, #2d5016, #3a6b1f);
+  width: 120px ;
+  height: 120px ;
+  border-radius: 50%;
+  text-align: center;
+  color: #f5e6d3;
+  box-shadow: 0 8px 20px rgba(45, 80, 22, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.countdown-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(45, 80, 22, 0.4);
+}
+
+.countdown-item span:first-child {
+  display: block;
+  font-size: 45px;
+  font-weight: 700;
+  font-family: "Playfair Display", serif;
+}
+
+.countdown-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 300;
+}
+
+/* Enhanced ceremony section */
+.ceremony-section {
+  background: #f9f7f5;
+  padding: 5rem 0;
+}
+
+.church-image-container {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.church-image {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(45, 80, 22, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.church-image:hover {
+  transform: scale(1.05);
+}
+
+.ceremony-details {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.ceremony-name {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: #2d5016;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.ceremony-address {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #3a6b1f;
+  margin-bottom: 0.5rem;
+}
+
+.ceremony-time {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #3a6b1f;
+  font-weight: 600;
+}
+
+/* Improved button styling with better mobile touch targets */
+.btn-container {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.button-primary,
+.button-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #2d5016, #3a6b1f);
+  color: #f5e6d3;
+  padding: 1rem 2.5rem;
+  border: none;
+  border-radius: 50px;
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(45, 80, 22, 0.3);
+  text-decoration: none;
+  min-height: 48px;
+}
+
+.button-primary:hover,
+.button-confirm:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(45, 80, 22, 0.4);
+  background: linear-gradient(135deg, #3a6b1f, #2d5016);
+}
+
+.button-primary:active,
+.button-confirm:active {
+  transform: translateY(-1px);
+}
+
+/* Enhanced photo timeline with better responsive grid */
+.timeline-section {
+  background: white;
+  padding: 5rem 0;
+}
+
+.timeline-intro {
+  text-align: center;
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  color: #3a6b1f;
+  margin-bottom: 4rem;
+  font-style: italic;
+}
+
+.photo-timeline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 3rem;
+  margin-top: 3rem;
+}
+
+.timeline-item {
+  position: relative;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.timeline-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.timeline-photo {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(45, 80, 22, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.timeline-photo:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(45, 80, 22, 0.3);
+}
+
+.timeline-photo img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  display: block;
+}
+
+.timeline-year {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #2d5016, #3a6b1f);
+  color: #f5e6d3;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-family: "Playfair Display", serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.timeline-description {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.timeline-description h3 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+  color: #2d5016;
+  margin-bottom: 0.5rem;
+}
+
+.timeline-description p {
+  font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+  color: #3a6b1f;
+  line-height: 1.6;
+}
+
+/* Enhanced itinerary with better mobile layout */
+.itinerary-section {
+  background: #f9f7f5;
+  padding: 5rem 0;
+}
+
+.itinerary-timeline {
+  max-width: 700px;
+  margin: 3rem auto;
+  position: relative;
+}
+
+.itinerary-item {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+  align-items: start;
+}
+
+.itinerary-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #2d5016, #3a6b1f);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f5e6d3;
+  font-size: 1.5rem;
+  box-shadow: 0 6px 20px rgba(45, 80, 22, 0.3);
+  z-index: 2;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.itinerary-line {
+  position: absolute;
+  left: 30px;
+  top: 60px;
+  width: 3px;
+  height: calc(100% + 2rem);
+  background: linear-gradient(180deg, #2d5016, #e8d5c0);
+}
+
+.itinerary-line.last {
+  display: none;
+}
+
+.itinerary-details {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(45, 80, 22, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.itinerary-details:hover {
+  transform: translateX(10px);
+  box-shadow: 0 6px 20px rgba(45, 80, 22, 0.2);
+}
+
+.itinerary-text {
+  font-size: 0.85rem;
+  color: #2d5016;
+  font-weight: 600;
+  flex: 1;
+  min-width: 150px;
+}
+
+.itinerary-time {
+  font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+  color: #47c800;
+  font-weight: 600;
+  background: #f9f7f5;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+}
+
+/* Enhanced dress code section */
+.dress-code-section {
+  background: white;
+  padding: 3rem 0;
+  text-align: center;
+}
+
+.dress-code-icon {
+  color: #2d5016;
+  margin: 2rem 0;
+}
+
+.dress-code-title {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  color: #2d5016;
+  font-weight: 700;
+  margin: 1rem 0;
+}
+
+.dress-code-description {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #3a6b1f;
+  max-width: 600px;
+  margin: 1rem auto;
+  line-height: 1.8;
+}
+
+/* Improved guests section with better card layout */
+.guests-section {
+  background: #f9f7f5;
+  padding: 5rem 0;
+}
+
+.guests-info {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.subsection-title {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: #2d5016;
+  margin: 3rem 0 1.5rem 0;
+  text-align: center;
+}
+
+.guests-list,
+.tables-list {
+  list-style: none;
+  padding: 0;
+  gap: 1rem;
+}
+
+.guest-item,
+.table-item {
+  color: #3a6b1f;
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  font-family: "Playfair Display", serif;
+  justify-content: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+
+}
+
+
+/* Enhanced reservation section */
+.reservation-section {
+  background: white;
+  padding: 3rem 0;
+  text-align: center;
+}
+
+.location-info {
+  margin: 2rem 0;
+}
+
+.venue-name {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: #2d5016;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.venue-address,
+.venue-time {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #3a6b1f;
+  margin-bottom: 0.5rem;
+}
+
+.reserve-text {
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  color: #3a6b1f;
+  margin: 2rem 0 1rem;
+  font-weight: 500;
+}
+
+.guest-count {
+  font-family: "Playfair Display", serif;
+  font-size: 2rem;
+  color: #2d5016;
+  font-weight: 700;
+  margin: 1rem 0 2rem;
+}
+
+.button-confirm {
+  margin: 2rem auto 0rem;
+}
+
+/* Enhanced modal styling with better mobile support */
+.modal-content {
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 15px 50px rgba(45, 80, 22, 0.3);
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #2d5016, #3a6b1f);
+  color: #f5e6d3;
+  border-radius: 20px 20px 0 0;
+  padding: 1.5rem 2rem;
+  border: none;
+}
+
+.modal-title {
+  font-family: poppins, sans-serif;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  font-weight: 600;
+}
+
+.btn-close {
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+.modal-body {
+  padding: 2rem;
+  background: #fdfcfa;
+}
+
+.modal-intro {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #2d5016;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.song-suggestion {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 2px solid #e8d5c0;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.song-suggestion:hover {
+  border-color: #2d5016;
+}
+
+.form-label {
+  color: #2d5016;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: clamp(0.9rem, 1.8vw, 1rem);
+}
+
+.form-control {
+  border: 2px solid #e8d5c0;
+  border-radius: 10px;
+  padding: 0.875rem;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #2d5016;
+  box-shadow: 0 0 0 0.25rem rgba(45, 80, 22, 0.15);
+  outline: none;
+}
+
+.btn-outline-success {
+  color: #2d5016;
+  border-color: #2d5016;
+  font-weight: 600;
+  border-width: 2px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-success:hover {
+  background-color: #2d5016;
+  border-color: #2d5016;
+  color: #f5e6d3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+}
+
+.modal-footer {
+  background: #f9f7f5;
+  border-radius: 0 0 20px 20px;
+  padding: 1.5rem 2rem;
+  border: none;
+  gap: 1rem;
+}
+
+.btn-success {
+  background-color: #2d5016;
+  border-color: #2d5016;
+  font-weight: 600;
+  padding: 0.875rem 2rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  background-color: #3a6b1f;
+  border-color: #3a6b1f;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(45, 80, 22, 0.3);
+}
+
+.btn-secondary {
+  background-color: #8b8b8b;
+  border-color: #8b8b8b;
+  font-weight: 600;
+  padding: 0.875rem 2rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #6b6b6b;
+  border-color: #6b6b6b;
+  transform: translateY(-2px);
+}
+
+/* Animation keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive breakpoints for mobile optimization */
+@media (max-width: 768px) {
+  .floral-decoration {
+    width: 100px;
+  }
+
+  .hero-section {
+    min-height: 90vh;
+    padding: 1rem;
+  }
+
+  .photo-timeline {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .timeline-photo img {
+    height: 300px;
+  }
+
+  .itinerary-item {
+    grid-template-columns: 50px 1fr;
+    gap: 1rem;
+  }
+
+  .itinerary-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+
+  .itinerary-line {
+    left: 25px;
+  }
+
+  .itinerary-details {
+    padding: 0.31rem;
+  }
+
+  .guests-list,
+  .tables-list {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-dialog {
+    margin: 1rem;
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .floral-decoration {
+    width: 60px;
+    opacity: 0.5;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .countdown-container {
+    gap: 0.75rem;
+  }
+
+  .countdown-item {
+    width: 75px;
+    height: 75px;
+
+  }
+
+  .countdown-item span:first-child {
+    font-size: 2rem;
+    margin: 0 0 -1rem;
+  }
+
+  .countdown-label {
+    font-size: 0.55rem;
+  }
+
+  .section-header {
+    font-size: 1.8rem;
+  }
+
+  .button-primary,
+  .button-confirm {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}
