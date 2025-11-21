@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +22,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4y8s5^1l@i@bz90rjcqxuda!6oknb4m&_d+w2b()k&5ec68j&6'
+# Read secret key from environment for production; fall back to the existing
+# development key when not provided.
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'django-insecure-4y8s5^1l@i@bz90rjcqxuda!6oknb4m&_d+w2b()k&5ec68j&6'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Control via environment variable `DJANGO_DEBUG` (use 'True' or 'False')
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+# Allow configuring hosts via environment variable `ALLOWED_HOSTS` (comma-separated)
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
 
 # Application definition
@@ -44,6 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -80,6 +89,15 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+}
+
+# Use `DATABASE_URL` env var (Render provides this when you add a PostgreSQL
+# managed database). Fall back to the local sqlite DB when not provided.
+DATABASES = {
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+    )
 }
 
 
@@ -127,6 +145,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATICFILES_DIRS = [
     BASE_DIR / "assets",  # Carpeta estática existente
 ]
+
+# Use WhiteNoise storage for serving compressed static assets in production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

@@ -1,3 +1,41 @@
+Despliegue en Render
+--------------------
+
+Pasos rápidos para desplegar este proyecto en Render:
+
+- Asegúrate de tener un repo en GitHub (este proyecto) y de conectar Render al repo.
+- En el panel de Render, crea un nuevo "Web Service" y selecciona el repo y la rama `main`.
+- En la sección de `Environment` configura las variables de entorno:
+   - `SECRET_KEY` : una clave segura para producción.
+   - `DJANGO_DEBUG` : `False` en producción.
+   - `ALLOWED_HOSTS` : por ejemplo `your-app.onrender.com` o `*` para pruebas.
+   - Si usas una base de datos gestionada, Render proveerá `DATABASE_URL`.
+- Render ejecutará `pip install -r requirements.txt` y luego ejecutará el proceso definido en `Procfile`.
+
+Configuración aplicada en el proyecto:
+- `proyecto/settings.py` ahora lee `SECRET_KEY`, `DJANGO_DEBUG` y `ALLOWED_HOSTS` desde variables de entorno.
+- Se añadió `whitenoise` para servir archivos estáticos y `STATICFILES_STORAGE` está configurado.
+- `dj-database-url` se usa para leer `DATABASE_URL` si está presente; si no, se usa sqlite local.
+- Se agregó `Procfile` (usa `gunicorn`) y `runtime.txt` con la versión de Python.
+
+Comandos útiles (localmente):
+```bash
+# Instalar dependencias
+pip install -r requirements.txt
+
+# Recolectar estáticos en el servidor (en Render esto se ejecuta durante el despliegue si lo configuras)
+python manage.py collectstatic --noinput
+
+# Comandos para preparar y push
+git add .
+git commit -m "Preparo despliegue a Render: settings, Procfile, requirements"
+git push origin main
+```
+
+Notas:
+- En producción revisa `DEBUG=False` y asegúrate de usar una `SECRET_KEY` segura.
+- Si usas `CompressedManifestStaticFilesStorage`, asegúrate de que `collectstatic` se ejecute correctamente y que no falten archivos estáticos referenciados.
+
 INSTALACIÓN DEL PROYECTO DJANGO
 
 1. Clona el repositorio o descarga el proyecto.
